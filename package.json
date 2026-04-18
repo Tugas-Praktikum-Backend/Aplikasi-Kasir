@@ -18,8 +18,10 @@
   },
   "homepage": "https://github.com/Tugas-Praktikum-Backend/Aplikasi-Kasir-Reyhan#readme",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "express": "^5.2.1",
     "http": "^0.0.1-security",
+    "mongoose": "^9.4.1",
     "nodemon": "^3.1.14"
   }
 }
