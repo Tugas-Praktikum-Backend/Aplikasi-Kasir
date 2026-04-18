@@ -1,0 +1,1 @@
+require('/src/modules/module-manager').init()
