@@ -1,14 +1,26 @@
 const mongoose = require("mongoose");
 const list = [
     "./discounts/discount-schema"
-]
+];
+const loaded = {};
+let isLoaded = false;
 
 function init(){
     mongoose.connect(process.env.MONGO_URI).then(r => {
         for(const schemaPath of list){
-            require(schemaPath)(mongoose);
+            const result = require(schemaPath)(mongoose);
+            loaded[result.id] = result.model;
         }
+        isLoaded = true;
     });
 }
 
-module.exports = { init }
+function getDatabase(id){
+    return loaded[id]
+}
+
+function isDbLoaded(){
+    return isLoaded
+}
+
+module.exports = { init, getDatabase, isDbLoaded }

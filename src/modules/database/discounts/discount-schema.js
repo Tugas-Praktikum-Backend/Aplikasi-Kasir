@@ -1,3 +1,9 @@
-module.exports = (db) => {
-    db.model('Discount', db.Schema({test: String}))
-}
+module.exports = (db) => (
+    {
+        id: "Discounts",
+        model: db.model('Discounts', db.Schema({
+            products: String,
+            discountAmount: Number
+        }))
+    }
+);
