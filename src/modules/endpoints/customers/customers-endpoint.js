@@ -51,7 +51,7 @@ async function getCustomers(req, res, next){
             customer_name: c.customerName,
             payment_method: c.paymentMethod
         }));
-        res.status(200).json({ customers  });
+        res.status(200).json({ customers });
     } catch(err){
         next(err);
     }
@@ -67,7 +67,7 @@ async function getCustomer(req, res, next){
         if(!result){
             throw Error('Customer not found');
         }
-        res.status(200).json({ id: result._id, customer_name: result.customerName, payment_method: result.paymentMethod });
+        res.status(200).json({ Customers: result });
     } catch (err) {
         next(err);
     }

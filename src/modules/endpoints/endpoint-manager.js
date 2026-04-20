@@ -3,9 +3,9 @@ const app = express();
 const route = express.Router();
 const list = [
     "./discounts/discounts-endpoint",
-    "./shifts/shifts-endpoint"
+    "./products/products-endpoint",
+    "./customers/customers-endpoint"
 ]
-
 async function init(){
     app.use(express.json());
     app.use('/api', route);
