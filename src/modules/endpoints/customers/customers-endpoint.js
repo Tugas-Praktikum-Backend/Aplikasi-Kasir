@@ -30,11 +30,12 @@ async function addCustomer(req, res, next){
 async function deleteCustomer(req, res, next){
     try {
         const id = req.params.id;
-        if(!id){
+        if((!id) || (id === ":productId")){
             throw Error('Missing id parameter');
         }
+
         const result = await db.deleteOne({ _id: id });
-        if(result.deletedCount === 0){
+        if(!result){
             throw Error(`Failed to delete customer with id ${id}`);
         }
         res.status(200).json({ message: `Successfully deleted customer with id ${id}`});
@@ -60,10 +61,10 @@ async function getCustomers(req, res, next){
 async function getCustomer(req, res, next){
     try {
         const id = req.params.id;
-        if(!id){
+        if((!id) || (id === ":productId")){
             throw Error('Missing id parameter');
         }
-        const result = await db.findById(id);
+        const result = await db.findOne({ _id: id });
         if(!result){
             throw Error('Customer not found');
         }
@@ -78,7 +79,7 @@ async function updateCustomer(req, res, next){
         const customerName = req.body.customer_name?.trim().toLowerCase();
 
         const id = req.params.id;
-        if(!id) {
+        if((!id) || (id === ":productId")){
             throw Error('Missing id parameter');
         }
 
@@ -86,8 +87,8 @@ async function updateCustomer(req, res, next){
             throw Error('Name is required');
         }
 
-        const result = await db.updateOne({ _id: id }, { $set: {customerName}})
-        if(result.matchedCount === 0){
+        const result = await db.findOneAndUpdate({ _id: id }, { $set: {customerName}})
+         if(!result){
             throw Error(`Failed to update customer with id ${id}`);
         }
         res.status(200).json({ message: `Successfully updated customer with id ${id}`});
@@ -100,7 +101,7 @@ async function addPayment(req, res, next){
     try{
         const provider = req.body.provider?.trim().toUpperCase();
         const id = req.params.id;
-
+        
         if(!provider){
             throw Error('Provider is required');
         }
