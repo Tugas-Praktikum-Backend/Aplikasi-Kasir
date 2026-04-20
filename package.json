@@ -1,5 +1,5 @@
 {
-  "name": "aplikasi-kasir-reyhan",
+  "name": "aplikasi-kasir",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,15 +8,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Tugas-Praktikum-Backend/Aplikasi-Kasir-Reyhan.git"
+    "url": "git+https://github.com/Tugas-Praktikum-Backend/Aplikasi-Kasir.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Tugas-Praktikum-Backend/Aplikasi-Kasir-Reyhan/issues"
+    "url": "https://github.com/Tugas-Praktikum-Backend/Aplikasi-Kasir/issues"
   },
-  "homepage": "https://github.com/Tugas-Praktikum-Backend/Aplikasi-Kasir-Reyhan#readme",
+  "homepage": "https://github.com/Tugas-Praktikum-Backend/Aplikasi-Kasir#readme",
   "dependencies": {
     "bcrypt": "^6.0.0",
     "dotenv": "^17.4.2",
