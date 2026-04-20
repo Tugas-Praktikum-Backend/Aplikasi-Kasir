@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
 const list = [
     "./products/product-schema",
-    "./discounts/discount-schema"
+    "./discounts/discount-schema",
+    "./customers/customers-schema"
 ];
 const loaded = {};
 let isLoaded = false;
