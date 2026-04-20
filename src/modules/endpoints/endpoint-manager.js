@@ -4,7 +4,8 @@ const route = express.Router();
 const list = [
     "./discounts/discounts-endpoint",
     "./products/products-endpoint",
-    "./customers/customers-endpoint"
+    "./customers/customers-endpoint",
+    "./employees/employees-endpoint"
 ]
 async function init(){
     app.use(express.json());
