@@ -6,15 +6,14 @@ async function addProducts(req, res, next){
         if(!req.body){
             throw Error('Products data are missing!');
         }
-        const { productId, productName, productPrice, productStock } = req.body;
-        if(!productId || !productName || !productPrice || productStock === undefined){
+        const { productId, productName, productPrice } = req.body;
+        if(!productId || !productName || !productPrice === undefined){
             throw Error('Products data are missing!');
         }
         const result = await db.create({
             productId: productId,
             productName: productName,
-            productPrice: productPrice,
-            productStock: productStock
+            productPrice: productPrice
         });
         if(!result){
             throw Error('Failed to create Products data');
@@ -27,11 +26,11 @@ async function addProducts(req, res, next){
 
 async function getProductsById(req, res, next){
     try {
-        const id = req.params.id;
+        const id = req.params.productId;
         if((!id) || (id === ":id")){
             throw Error('Missing id parameter');
         }
-        const result = await db.findOne({ _id: id });
+        const result = await db.findOne({ productId });
         if(!result){
             throw Error('Failed to fetch Products data');
         }
@@ -43,14 +42,14 @@ async function getProductsById(req, res, next){
 
 async function updateProductsById(req, res, next){
     try {
-        const id = req.params.id;
+        const id = req.params.productId;
         if((!id) || (id === ":id")){
             throw Error('Missing id parameter');
         }
         
         const { productId, productName, productPrice, productStock } = req.body;
         const result = await db.findOneAndUpdate(
-            { _id: id },
+            { productId: id },
             { productId, productName, productPrice, productStock },
             { new: true }
         );
@@ -67,7 +66,7 @@ async function updateProductsById(req, res, next){
 
 async function deleteProducts(req, res, next){
     try {
-        const id = req.params.id;
+        const id = req.params.productId;
         if((!id) || (id === ":id")){
             throw Error('Missing id parameter');
         }
@@ -85,7 +84,7 @@ async function deleteProducts(req, res, next){
 
 async function updateProductsStock(req, res, next){
     try {
-        const id = req.params.id;
+        const id = req.params.productId;
         if((!id) || (id === ":id")){
             throw Error('Missing id parameter');
         }
@@ -94,7 +93,13 @@ async function updateProductsStock(req, res, next){
         if(productStock === undefined){
             throw Error('Stock amount is missing!');
         }
-        
+        if(!amount || amount <= 0){
+            throw Error('Amount must be greater than 0');
+        }   
+        const result = await db.updateOne(
+            { productId: id },
+            { $inc: { "productStock": productStock } }
+        );
         const result = await db.findOneAndUpdate(
             { _id: id },
             { productStock: productStock },

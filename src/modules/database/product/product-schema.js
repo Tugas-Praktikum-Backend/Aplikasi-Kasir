@@ -2,10 +2,10 @@ module.exports = (db) => (
     {
         id: "Products",
         model: db.model('Products', db.Schema({
-            productId: String,
-            productName: String,
-            productPrice: Number,
-            productStock: Number
-        }))
+            productId: {type: String, required: true},
+            productName: {type: String, required: true},
+            productPrice: {type: Number, required: true},
+            productStock: { type: Number, default: 0 }
+        }, {_id: false }))
     }
 );
