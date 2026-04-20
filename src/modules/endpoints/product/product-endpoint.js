@@ -27,14 +27,14 @@ async function addProducts(req, res, next){
 async function getProductsById(req, res, next){
     try {
         const id = req.params.productId;
-        if((!id) || (id === ":id")){
+        if((!id) || (id === ":productId")){
             throw Error('Missing id parameter');
         }
         const result = await db.findOne({ productId: id });
         if(!result){
             throw Error('Failed to get Products data');
         }
-        res.status(201).json({ Products: result });
+        res.status(200).json({ Products: result });
     } catch(err){
         next(err);
     }
@@ -43,15 +43,15 @@ async function getProductsById(req, res, next){
 async function updateProductsById(req, res, next){
     try {
         const id = req.params.productId;
-        if((!id) || (id === ":id")){
+        if((!id) || (id === ":productId")){
             throw Error('Missing id parameter');
         }
         
-        const {  productName, productPrice, productStock } = req.body;
+        const { productName, productPrice } = req.body;
         
         const result = await db.findOneAndUpdate(
             { productId: id },
-            { productName, productPrice, productStock },
+            { productName, productPrice },
             { new: true }
         );
         
@@ -68,7 +68,7 @@ async function updateProductsById(req, res, next){
 async function deleteProducts(req, res, next){
     try {
         const id = req.params.productId;
-        if((!id) || (id === ":id")){
+        if((!id) || (id === "productId")){
             throw Error('Missing id parameter');
         }
         
@@ -77,7 +77,7 @@ async function deleteProducts(req, res, next){
             throw Error(`Failed to delete Products with id ${id}`);
         }
         
-        res.status(201).json({ message: `Successfully deleted Products with id ${id}` });
+        res.status(200).json({ message: `Successfully deleted Products with id ${id}` });
     } catch(err){
         next(err);
     }
@@ -86,7 +86,7 @@ async function deleteProducts(req, res, next){
 async function updateProductsStock(req, res, next){
     try {
         const id = req.params.productId;
-        if((!id) || (id === ":id")){
+        if((!id) || (id === "productId")){
             throw Error('Missing id parameter');
         }
         

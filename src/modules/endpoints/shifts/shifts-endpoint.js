@@ -61,7 +61,7 @@ async function endShift(req, res, next) {
 async function getShifts(req, res, next) {
     try {
         const result = await db.find({});
-        res.status(200).json({ shifts: result });
+        res.status(200).json({ Shifts: result });
     } catch(err) {
         next(err);
     }
