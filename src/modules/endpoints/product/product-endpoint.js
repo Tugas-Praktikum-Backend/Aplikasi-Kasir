@@ -30,9 +30,9 @@ async function getProductsById(req, res, next){
         if((!id) || (id === ":id")){
             throw Error('Missing id parameter');
         }
-        const result = await db.findOne({ productId });
+        const result = await db.findOne({ productId: id });
         if(!result){
-            throw Error('Failed to fetch Products data');
+            throw Error('Failed to get Products data');
         }
         res.status(201).json({ Products: result });
     } catch(err){
@@ -47,10 +47,11 @@ async function updateProductsById(req, res, next){
             throw Error('Missing id parameter');
         }
         
-        const { productId, productName, productPrice, productStock } = req.body;
+        const {  productName, productPrice, productStock } = req.body;
+        
         const result = await db.findOneAndUpdate(
             { productId: id },
-            { productId, productName, productPrice, productStock },
+            { productName, productPrice, productStock },
             { new: true }
         );
         
@@ -58,7 +59,7 @@ async function updateProductsById(req, res, next){
             throw Error(`Failed to update Products with id ${id}`);
         }
         
-        res.status(201).json({ message: `Successfully updated Products with id ${id}` });
+        res.status(200).json({ message: `Successfully updated Products with id ${id}` });
     } catch(err){
         next(err);
     }
@@ -71,7 +72,7 @@ async function deleteProducts(req, res, next){
             throw Error('Missing id parameter');
         }
         
-        const result = await db.deleteOne({ _id: id });
+        const result = await db.deleteOne({ productId: id });
         if(!result){
             throw Error(`Failed to delete Products with id ${id}`);
         }
@@ -93,24 +94,19 @@ async function updateProductsStock(req, res, next){
         if(productStock === undefined){
             throw Error('Stock amount is missing!');
         }
-        if(!amount || amount <= 0){
-            throw Error('Amount must be greater than 0');
+        if(productStock <= 0){
+            throw Error('Product stock must be greater than 0');
         }   
         const result = await db.updateOne(
             { productId: id },
-            { $inc: { "productStock": productStock } }
-        );
-        const result = await db.findOneAndUpdate(
-            { _id: id },
-            { productStock: productStock },
+            { $inc: { "productStock": productStock } },
             { new: true }
         );
-        
         if(!result){
             throw Error(`Failed to update stock for Products with id ${id}`);
         }
         
-        res.status(201).json({ message: `Successfully updated stock for Products with id ${id}` });
+        res.status(200).json({ message: `Successfully updated stock for Products with id ${id}` });
     } catch(err){
         next(err);
     }
@@ -118,10 +114,10 @@ async function updateProductsStock(req, res, next){
 
 module.exports = (app) => {
     route.post('/', addProducts);
-    route.get('/:id', getProductsById);
-    route.put('/:id', updateProductsById);
-    route.delete('/:id', deleteProducts);
-    route.put('/:id/stock', updateProductsStock);
+    route.get('/:productId', getProductsById);
+    route.put('/:productId', updateProductsById);
+    route.delete('/:productId', deleteProducts);
+    route.put('/:productId/stock', updateProductsStock);
 
     app.use('/products', route);
 }
