@@ -3,7 +3,11 @@ const list = [
     "./products/product-schema",
     "./discounts/discount-schema",
     "./customers/customers-schema",
+<<<<<<< HEAD
+    "./employees/employees-schema",
+=======
     "./shifts/shifts-schema"
+>>>>>>> 66dfb46e757cbd0e1b1906fb6ef3984e06cf7b11
 ];
 const loaded = {};
 let isLoaded = false;
