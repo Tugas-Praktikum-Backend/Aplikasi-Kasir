@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const list = [
-    "./discounts/discount-schema"
+    "./discounts/discount-schema",
+    "./shifts/shifts-schema"
 ];
 const loaded = {};
 let isLoaded = false;

@@ -2,7 +2,8 @@ const express = require('express')
 const app = express();
 const route = express.Router();
 const list = [
-    "./discounts/discounts-endpoint"
+    "./discounts/discounts-endpoint",
+    "./shifts/shifts-endpoint"
 ]
 
 async function init(){
