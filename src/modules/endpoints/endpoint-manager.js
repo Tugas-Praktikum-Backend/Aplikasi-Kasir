@@ -3,7 +3,7 @@ const app = express();
 const route = express.Router();
 const list = [
     "./discounts/discounts-endpoint",
-    "./products/products-endpoint",
+    "./product/product-endpoint",
     "./customers/customers-endpoint",
     "./employees/employees-endpoint",
     "./shifts/shifts-endpoint",
