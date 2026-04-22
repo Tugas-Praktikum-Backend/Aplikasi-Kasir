@@ -5,6 +5,8 @@ module.exports = (db) => ({
     db.Schema({
       products: String,
       discountAmount: Number,
+      discountStart: Number,
+      discountDuration: Number
     })
   ),
 });

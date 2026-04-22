@@ -16,15 +16,17 @@ async function getDiscounts(req, res, next) {
 async function addDiscount(req, res, next) {
   try {
     if (!req.body) {
-      throw Error('Products or discount amount are missing!');
+      throw Error('Missing body!');
     }
-    const { products, discountAmount } = req.body;
-    if (!products || !discountAmount) {
-      throw Error('Products or discount amount are missing!');
+    const { products, discountAmount, discountDuration } = req.body;
+    if(!products || !discountAmount || !discountDuration){
+      throw Error('Products, discount amount, and discount duration are required');
     }
     const result = await db.create({
       products: JSON.stringify(products),
       discountAmount: discountAmount,
+      discountStart: Math.floor(Date.now() / 1000),
+      discountDuration: discountDuration
     });
     if (!result) {
       throw Error('Failed to fetch discounts data');

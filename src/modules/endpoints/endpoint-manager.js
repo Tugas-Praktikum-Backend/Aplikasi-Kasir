@@ -8,8 +8,11 @@ const list = [
     "./employees/employees-endpoint",
     "./shifts/shifts-endpoint",
 ]
+const { handleAuth } = require('../middleware/middleware')
+
 async function init(){
     app.use(express.json());
+    app.use(handleAuth);
     app.use('/api', route);
 
     for(const endpoint of list){

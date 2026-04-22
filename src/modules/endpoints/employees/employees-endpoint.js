@@ -1,5 +1,6 @@
 const route = require('express').Router();
 const db = require('../../database/database-manager').getDatabase('Employees');
+const { newToken } = require('../../middleware/middleware')
 
 async function addEmployee(req, res, next) {
   try {
@@ -91,12 +92,40 @@ async function deleteEmployee(req, res, next) {
   }
 }
 
+async function loginEmployee(req, res, next){
+  try {
+    if(!req.body){
+      throw Error('employeeName and employeePassword are required');
+    }
+    const { employeeName, employeePassword } = req.body;
+    if (!employeeName || !employeePassword) {
+      throw Error('employeeName and employeePassword are required');
+    }
+
+    const result = await db.find({ employeeName, employeePassword });
+    if(!result || result.length <= 0){
+      return res.status(401).json({
+        message: `Authorization failed`,
+      });
+    }
+
+    const token = newToken(result[0].employeeName);
+    return res.status(200).json({
+      message: `Authorization successfully`,
+      token: token
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = (app) => {
   route.post('/', addEmployee);
   route.get('/', getEmployees);
   route.get('/:employeeId', getEmployee);
   route.put('/:employeeId', updateEmployee);
   route.delete('/:employeeId', deleteEmployee);
+  route.post('/login', loginEmployee);
 
   app.use('/employees', route);
 };
