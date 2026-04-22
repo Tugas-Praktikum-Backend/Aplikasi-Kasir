@@ -1,10 +1,10 @@
 const route = require('express').Router();
 const db = require('../../database/database-manager').getDatabase('Employees');
-const { newToken } = require('../../middleware/middleware')
+const { newToken } = require('../../middleware/middleware');
 
 async function addEmployee(req, res, next) {
   try {
-    const { employee_id, employee_name: employeeName, employee_password: employeePassword } = req.body;
+    const { employee_id, employee_name, employee_password } = req.body;
 
     if (!employeeName || !employeePassword || !employeeId) {
       throw Error('employeeName and employeePassword are required');
@@ -12,8 +12,8 @@ async function addEmployee(req, res, next) {
 
     const result = await db.create({
       employeeId: employee_id,
-      employeeName,
-      employeePassword,
+      employeeName: employee_name,
+      employeePassword: employee_password,
     });
 
     if (!result) {
@@ -43,10 +43,10 @@ async function getEmployees(req, res, next) {
 
 async function getEmployee(req, res, next) {
   try {
-    const id = req.params.id;
+    const id = req.params.employeeId;
     if (!id) throw Error('Missing id parameter');
 
-    const employee = await db.findById(id);
+    const employee = await db.findOne({ employeeId: id });
 
     res.status(200).json({
       message: `Successfully retrieved employee with id ${id}`,
@@ -62,7 +62,14 @@ async function updateEmployee(req, res, next) {
     const id = req.params.id;
     if (!id) throw Error('Missing id parameter');
 
-    const result = await db.findByIdAndUpdate(id, req.body, { new: true });
+    const result = await db.findOneAndUpdate(
+      { employeeId: id },
+      { $set: { employeeName } }
+    );
+
+    if (!result) {
+      throw Error(`Failed to update customer with id ${id}`);
+    }
 
     res.status(200).json({
       message: `Successfully updated employee with id ${id}`,
@@ -92,9 +99,9 @@ async function deleteEmployee(req, res, next) {
   }
 }
 
-async function loginEmployee(req, res, next){
+async function loginEmployee(req, res, next) {
   try {
-    if(!req.body){
+    if (!req.body) {
       throw Error('employeeName and employeePassword are required');
     }
     const { employeeName, employeePassword } = req.body;
@@ -103,7 +110,7 @@ async function loginEmployee(req, res, next){
     }
 
     const result = await db.find({ employeeName, employeePassword });
-    if(!result || result.length <= 0){
+    if (!result || result.length <= 0) {
       return res.status(401).json({
         message: `Authorization failed`,
       });
@@ -112,7 +119,7 @@ async function loginEmployee(req, res, next){
     const token = newToken(result[0].employeeName);
     return res.status(200).json({
       message: `Authorization successfully`,
-      token: token
+      token: token,
     });
   } catch (err) {
     next(err);
