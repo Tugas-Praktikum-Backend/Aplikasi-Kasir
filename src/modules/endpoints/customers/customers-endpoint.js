@@ -29,7 +29,7 @@ async function addCustomer(req, res, next) {
 
 async function deleteCustomer(req, res, next) {
   try {
-    const id = req.params.customerId;
+    const id = req.params.customerId?.trim().toLowerCase();
     if (!id || id === ':id') {
       throw Error('Missing id parameter');
     }
@@ -58,8 +58,8 @@ async function getCustomers(req, res, next) {
 
 async function getCustomer(req, res, next) {
   try {
-    const id = req.params.customerId;
-    if (!id || id === ':productId') {
+    const id = req.params.customerId?.trim().toLowerCase();
+    if (!id || id === ':customerId') {
       throw Error('Missing id parameter');
     }
     const result = await db.findOne({ customerId: id });
@@ -76,8 +76,8 @@ async function updateCustomer(req, res, next) {
   try {
     const customerName = req.body.customer_name?.trim().toLowerCase();
 
-    const id = req.params.customerId;
-    if (!id || id === ':productId') {
+    const id = req.params.customerId?.trim().toLowerCase();
+    if (!id || id === ':customerId') {
       throw Error('Missing id parameter');
     }
 
@@ -103,7 +103,7 @@ async function updateCustomer(req, res, next) {
 async function addPayment(req, res, next) {
   try {
     const provider = req.body.provider?.trim().toUpperCase();
-    const id = req.params.customerId;
+    const id = req.params.customerId?.trim().toLowerCase();
 
     if (!provider) {
       throw Error('Provider is required');
@@ -146,8 +146,8 @@ async function topUp(req, res, next) {
   try {
     const provider = req.body.provider?.trim().toUpperCase();
     const amount = Number(req.body.amount);
-    const id = req.params.customerId;
-    if (!id || id === ':productId') {
+    const id = req.params.customerId?.trim().toLowerCase();
+    if (!id || id === ':customerId') {
       throw Error('Missing id parameter');
     }
 
@@ -193,7 +193,7 @@ async function topUp(req, res, next) {
 async function deletePayment(req, res, next) {
   try {
     const provider = req.body.provider?.trim().toUpperCase();
-    const id = req.params.customerId;
+    const id = req.params.customerId?.trim().toLowerCase();
 
     if (!provider) {
       throw Error('Provider is required');

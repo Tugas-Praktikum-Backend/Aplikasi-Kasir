@@ -7,10 +7,12 @@ async function addProducts(req, res, next) {
       throw Error('Products data are missing!');
     }
     const {
-      product_id,
       product_name,
       product_price,
     } = req.body;
+
+    const product_id = req.body.product_id?.trim().toUpperCase();
+
     if (!product_id || !product_name || product_price === undefined) {
       throw Error('Products data are missing!');
     }
@@ -44,7 +46,7 @@ async function getProducts(req, res, next) {
 
 async function getProductsById(req, res, next) {
   try {
-    const id = req.params.productId;
+    const id = req.params.productId?.trim().toUpperCase();
     if (!id || id === ':id') {
       throw Error('Missing id parameter');
     }
@@ -60,7 +62,7 @@ async function getProductsById(req, res, next) {
 
 async function updateProductsById(req, res, next) {
   try {
-    const id = req.params.productId;
+    const id = req.params.productId?.trim().toUpperCase();
     if (!id || id === ':id') {
       throw Error('Missing id parameter');
     }
@@ -89,7 +91,7 @@ async function updateProductsById(req, res, next) {
 
 async function deleteProducts(req, res, next) {
   try {
-    const id = req.params.productId;
+    const id = req.params.productId?.trim().toUpperCase();
     if (!id || id === ':id') {
       throw Error('Missing id parameter');
     }
@@ -109,7 +111,7 @@ async function deleteProducts(req, res, next) {
 
 async function updateProductsStock(req, res, next) {
   try {
-    const id = req.params.productId;
+    const id = req.params.productId?.trim().toUpperCase();
     if (!id || id === ':id') {
       throw Error('Missing id parameter');
     }
