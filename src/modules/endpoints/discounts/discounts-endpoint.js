@@ -3,11 +3,32 @@ const db = require('../../database/database-manager').getDatabase('Discounts');
 
 async function getDiscounts(req, res, next) {
   try {
-    const result = await db.find({});
+    let result = await db.find({});
     if (!result) {
       throw Error('Failed to fetch discounts data');
     }
-    res.status(201).json({ discounts: result });
+
+    let start = req.query.start;
+    let end = req.query.end;
+    if(start && end){
+      let temp = [];
+      start = new Date(Date.parse(start));
+      end = new Date(Date.parse(end));
+      for(const data of result){
+        const discountStart = new Date(data.discountStart * 1000);
+        const discountEnd = new Date((data.discountStart + data.discountDuration) * 1000);
+        if(((
+            start.getDate() === discountStart.getDate() &&
+            start.getMonth() === discountStart.getMonth() &&
+            start.getFullYear() === discountStart.getFullYear()
+          ) || discountStart.getTime() >= start.getTime()
+        ) && (discountEnd.getTime() >= end.getTime())){
+          temp.push(data);
+        }
+      }
+      result = temp;
+    }
+    return res.status(201).json({ discounts: result });
   } catch (err) {
     next(err);
   }
@@ -29,9 +50,9 @@ async function addDiscount(req, res, next) {
       discountDuration: discountDuration
     });
     if (!result) {
-      throw Error('Failed to fetch discounts data');
+      throw Error('Failed to add new discount');
     }
-    res.status(201).json({ message: 'Successfully added new discount ' });
+    res.status(201).json({ message: 'Successfully added new discount' });
   } catch (err) {
     next(err);
   }
@@ -55,9 +76,55 @@ async function deleteDiscount(req, res, next) {
   }
 }
 
+async function getDiscountById(req, res, next){
+  try {
+    if (!req.body) {
+      throw Error('Missing body!');
+    }
+    const { _id } = req.body;
+    const result = await db.find({ _id });
+    if (!result || result.length <= 0) {
+      throw Error('Invalid discount ID');
+    }
+    res.status(201).json({ discounts: result });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function updateDiscount(req, res, next){
+  try {
+    if(!req.params.id)throw Error('Invalid discount ID');
+
+    if (!req.body) {
+      throw Error('Missing body!');
+    }
+    const { products, discountAmount, discountDuration } = req.body;
+    const result = await db.find({ _id: req.params.id });
+    if (!result || result.length <= 0) {
+      throw Error('Invalid discount ID');
+    }
+    const lastData = result[0];
+    const data = {
+      _id: req.params.id ?? lastData["_id"],
+      products: JSON.stringify(products) ?? lastData["products"],
+      discountAmount: discountAmount ?? lastData["discountAmount"],
+      discountDuration: discountDuration ?? lastData["discountDuration"]
+    };
+    if(!await db.updateOne(data)){
+      return res.status(201).json({ message: 'Failed to update the discount data' });
+    }
+    return res.status(201).json({ message: 'Successfully updated discount data' });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = (app) => {
   route.get('/', getDiscounts);
   route.post('/', addDiscount);
+  route.get('/:id', getDiscountById);
+  route.patch('/:id', updateDiscount);
   route.delete('/:id', deleteDiscount);
 
   app.use('/discounts', route);
