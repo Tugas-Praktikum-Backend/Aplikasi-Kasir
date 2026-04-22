@@ -1,4 +1,4 @@
-# Aplikasi Kasir 
+# Aplikasi Kasir (inprogress transaksi belum tambahin dan belum di rapihin)
 
 ## Development Setup
 
