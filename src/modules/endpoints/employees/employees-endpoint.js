@@ -5,8 +5,7 @@ const { newToken } = require('../../middleware/middleware');
 async function addEmployee(req, res, next) {
   try {
     const { employee_id, employee_name, employee_password } = req.body;
-
-    if (!employeeName || !employeePassword || !employeeId) {
+    if (!employee_name || !employee_password || !employee_id) {
       throw Error('employeeName and employeePassword are required');
     }
 
@@ -21,7 +20,7 @@ async function addEmployee(req, res, next) {
     }
 
     res.status(201).json({
-      message: `Successfully added new employee: ${employeeName}`,
+      message: `Successfully added new employee: ${employee_id}`,
     });
   } catch (err) {
     next(err);
@@ -61,10 +60,14 @@ async function updateEmployee(req, res, next) {
   try {
     const id = req.params.id;
     if (!id) throw Error('Missing id parameter');
+    if(!req.body) throw Error('Missing body');
+
+    const employee_name = req.body.employee_name;
+    if(!employee_name) throw Error('Missing updated employee name');
 
     const result = await db.findOneAndUpdate(
       { employeeId: id },
-      { $set: { employeeName } }
+      { $set: { employee_name } }
     );
 
     if (!result) {
@@ -104,19 +107,22 @@ async function loginEmployee(req, res, next) {
     if (!req.body) {
       throw Error('employeeName and employeePassword are required');
     }
-    const { employeeName, employeePassword } = req.body;
-    if (!employeeName || !employeePassword) {
+    const { employee_id, employee_password } = req.body;
+    if (!employee_id || !employee_password) {
       throw Error('employeeName and employeePassword are required');
     }
 
-    const result = await db.find({ employeeName, employeePassword });
+    const result = await db.find({
+      employeeId: employee_id,
+      employeePassword: employee_password
+    });
     if (!result || result.length <= 0) {
       return res.status(401).json({
         message: `Authorization failed`,
       });
     }
 
-    const token = newToken(result[0].employeeName);
+    const token = newToken(result[0]["employee_name"]);
     return res.status(200).json({
       message: `Authorization successfully`,
       token: token,
