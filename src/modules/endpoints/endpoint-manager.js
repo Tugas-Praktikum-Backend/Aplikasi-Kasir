@@ -7,7 +7,7 @@ const list = [
     "./customers/customers-endpoint",
     "./employees/employees-endpoint",
     "./shifts/shifts-endpoint",
-      "./transaction/transaction-endpoint",
+    "./transaction/transaction-endpoint",
 ]
 const { handleAuth } = require('../middleware/middleware')
 

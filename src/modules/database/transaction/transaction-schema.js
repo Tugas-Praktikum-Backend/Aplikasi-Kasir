@@ -3,20 +3,19 @@ module.exports = (db) => ({
   model: db.model(
     'Transaction',
     db.Schema({
-      employeeID: {
-        type: employeeID,
+      employeeId: {
+        type: String,
         ref: 'Employees',
         required: true,
-
       },
-      customerID: {
-        type: customerID,
-        ref: 'Employees',
+      customerId: {
+        type: String,
+        ref: 'Customers',
         required: true,
       },
       transactionDate: {
         type: Date,
-        default: Date.now(0),
+        default: Date.now(),
       },
       purchaseList: {
         type: [
@@ -24,18 +23,21 @@ module.exports = (db) => ({
             {
               productId: {
                 type: String,
+                ref: 'Products',
                 required: true,
               },
               productPrice: {
-              type: Number,
-              required: true,
+                type: Number,
+                required: true,
               },
-              price: {
-              type: Number,
-              required: true,
+              productAmount: {
+                type: Number,
+                required: true,
+                min: 1,
               },
-            },{
-              _id: false
+            },
+            {
+              _id: false,
             }
           ),
         ],
@@ -45,19 +47,22 @@ module.exports = (db) => ({
         type: Number,
         default: 0,
       },
-      paymenMethod: {
+      paymentMethod: {
         type: String,
         required: true,
       },
-      discount: {
+      /*    discount: {
         type: Number,
-        required: true,
+        ref: 'Discounts',
+      },*/
+      adminFee: {
+        type: Number,
+        default: 0,
       },
       finalPrice: {
         type: Number,
         default: 0,
-      }
-    }
-      )
+      },
+    })
   ),
 });

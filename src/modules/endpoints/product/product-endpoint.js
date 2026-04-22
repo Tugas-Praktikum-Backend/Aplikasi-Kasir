@@ -116,16 +116,16 @@ async function updateProductsStock(req, res, next) {
       throw Error('Missing id parameter');
     }
 
-    const { productStock } = req.body;
-    if (productStock === undefined) {
+    const { product_stock } = req.body;
+    if (product_stock === undefined) {
       throw Error('Stock amount is missing!');
     }
-    if (productStock <= 0) {
+    if (product_stock <= 0) {
       throw Error('Product stock must be greater than 0');
     }
     const result = await db.findOneAndUpdate(
       { productId: id },
-      { $inc: { productStock: productStock } },
+      { $inc: { productStock: product_stock } },
       { new: true }
     );
     if (!result) {

@@ -61,14 +61,14 @@ async function updateEmployee(req, res, next) {
   try {
     const id = req.params.employeeId?.trim().toLowerCase();
     if (!id) throw Error('Missing id parameter');
-    if(!req.body) throw Error('Missing body');
+    if (!req.body) throw Error('Missing body');
 
     const employee_name = req.body.employee_name;
-    if(!employee_name) throw Error('Missing updated employee name');
+    if (!employee_name) throw Error('Missing updated employee name');
 
     const result = await db.findOneAndUpdate(
       { employeeId: id },
-      { $set: { employee_name } }
+      { $set: { employeeName: employee_name } }
     );
 
     if (!result) {
@@ -105,26 +105,24 @@ async function deleteEmployee(req, res, next) {
 
 async function loginEmployee(req, res, next) {
   try {
-    if (!req.body) {
-      throw Error('employeeName and employeePassword are required');
-    }
-    const { employee_password } = req.body;
-    const employee_id = req.params.employeeId?.trim().toLowerCase();
-    if (!employee_id || !employee_password) {
-      throw Error('employeeName and employeePassword are required');
+    const { employee_id, employee_password } = req.body;
+
+    const normalizedId = employee_id?.trim().toLowerCase();
+    if (!normalizedId || !employee_password) {
+      throw Error('employeeId and employeePassword are required');
     }
 
-    const result = await db.find({
-      employeeId: employee_id,
-      employeePassword: employee_password
+    const result = await db.findOne({
+      employeeId: normalizedId,
+      employeePassword: employee_password,
     });
-    if (!result || result.length <= 0) {
+    if (!result) {
       return res.status(401).json({
         message: `Authorization failed`,
       });
     }
 
-    const token = newToken(result[0]["employee_name"]);
+    const token = newToken(result.employeeName);
     return res.status(200).json({
       message: `Authorization successfully`,
       token: token,
