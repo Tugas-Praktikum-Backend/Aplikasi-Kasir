@@ -23,6 +23,8 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "http": "^0.0.1-security",
+    "jsonwebtoken": "^9.0.3",
+    "middleware": "^1.0.0",
     "mongoose": "^9.4.1",
     "nodemon": "^3.1.14"
   },
