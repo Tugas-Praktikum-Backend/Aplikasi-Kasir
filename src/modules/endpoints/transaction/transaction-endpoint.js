@@ -1,6 +1,6 @@
 const route = require('express').Router();
 const db = require('../../database/database-manager').getDatabase(
-  'Transactions'
+  'Transaction'
 );
 const productDb = require('../../database/database-manager').getDatabase(
   'Products'
@@ -10,6 +10,9 @@ const employeeDb = require('../../database/database-manager').getDatabase(
 );
 const customerDb = require('../../database/database-manager').getDatabase(
   'Customers'
+);
+const shiftDb = require('../../database/database-manager').getDatabase(
+  'Shifts'
 );
 
 const ADMIN_FEES = {
@@ -44,6 +47,17 @@ async function addTransactions(req, res, next) {
       throw Error(`Employee not found: ${employee_id}`);
     }
 
+    const activeShift = await shiftDb.findOne({
+      employeeId: employee_id,
+      endTime: null,
+    });
+
+    if (!activeShift) {
+      throw Error(
+        `Transaction denied: Employee ${employee_id} is not currently on duty. Please start a shift first.`
+      );
+    }
+
     const customer = await customerDb.findOne({
       customerId: customer_id,
     });
@@ -59,7 +73,7 @@ async function addTransactions(req, res, next) {
     const payment = customer.paymentMethod.find(
       (pm) => pm.provider?.toUpperCase() === payment_method
     );
-    
+
     if (!payment) {
       throw Error(`Customer does not have payment method: ${payment_method}`);
     }
@@ -108,9 +122,6 @@ async function addTransactions(req, res, next) {
         ? item.product_id.toUpperCase().trim()
         : null;
 
-      if (!normalizedId) {
-        throw Error('Invalid product_id');
-      }
       const product = productMap[normalizedId];
 
       if (!product) {
@@ -122,6 +133,14 @@ async function addTransactions(req, res, next) {
       if (!amount || amount <= 0) {
         throw Error(`Invalid amount for product: ${item.product_id}`);
       }
+
+      if (product.productStock < amount) {
+        throw Error(
+          `Insufficient stock for product ${product.productId}. Requested: ${amount}, Available: ${product.productStock}`
+        );
+      }
+
+      product.productStock -= amount;
 
       const productPrice = product.productPrice;
 
@@ -170,6 +189,7 @@ async function addTransactions(req, res, next) {
     }
 
     await customer.save();
+    await Promise.all(products.map((product) => product.save()));
     res.status(201).json({ message: 'Successfully added new Transactions' });
   } catch (err) {
     next(err);
