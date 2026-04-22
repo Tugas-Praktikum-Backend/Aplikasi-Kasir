@@ -1,18 +1,23 @@
 const route = require('express').Router();
-const db = require('../../database/database-manager').getDatabase(
+const dbManager = require('../../database/database-manager');
+const {checkExpired} = require("../../../utils/discountUtils");
+const db = dbManager.getDatabase(
   'Transaction'
 );
-const productDb = require('../../database/database-manager').getDatabase(
+const productDb = dbManager.getDatabase(
   'Products'
 );
-const employeeDb = require('../../database/database-manager').getDatabase(
+const employeeDb = dbManager.getDatabase(
   'Employees'
 );
-const customerDb = require('../../database/database-manager').getDatabase(
+const customerDb = dbManager.getDatabase(
   'Customers'
 );
-const shiftDb = require('../../database/database-manager').getDatabase(
+const shiftDb = dbManager.getDatabase(
   'Shifts'
+);
+const discountDb = dbManager.getDatabase(
+  'Discounts'
 );
 
 const ADMIN_FEES = {
@@ -116,6 +121,14 @@ async function addTransactions(req, res, next) {
     });
 
     let totalPrice = 0;
+    let discountList = discountDb.find({});
+    discountList = discountList.map((data) => {
+      if(!checkExpired(data))return undefined;
+      return {
+        productList: JSON.parse(data.products),
+        discountAmount: data.discountAmount
+      };
+    });
 
     const finalPurchaseList = purchase_list.map((item) => {
       const normalizedId = item.product_id
@@ -148,9 +161,15 @@ async function addTransactions(req, res, next) {
         throw Error(`Product price missing: ${product.productId}`);
       }
 
-      const subtotal = productPrice * amount;
+      let subtotal = productPrice * amount;
+      let discountTotal = 0;
+      for(const discount of discountList){
+        if(discount && discount.productList.products.find(normalizedId)){
+          discountTotal += discount.discountAmount;
+        }
+      }
 
-      totalPrice += subtotal;
+      totalPrice += (subtotal * (1 - Math.min(1, discountTotal)));
 
       return {
         productId: normalizedId,

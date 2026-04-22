@@ -1,5 +1,6 @@
 const route = require('express').Router();
 const db = require('../../database/database-manager').getDatabase('Discounts');
+const { checkExpired } = require('../../../utils/discountUtils');
 
 async function getDiscounts(req, res, next) {
   try {
@@ -15,16 +16,7 @@ async function getDiscounts(req, res, next) {
       start = new Date(Date.parse(start));
       end = new Date(Date.parse(end));
       for(const data of result){
-        const discountStart = new Date(data.discountStart * 1000);
-        const discountEnd = new Date((data.discountStart + data.discountDuration) * 1000);
-        if(((
-            start.getDate() === discountStart.getDate() &&
-            start.getMonth() === discountStart.getMonth() &&
-            start.getFullYear() === discountStart.getFullYear()
-          ) || discountStart.getTime() >= start.getTime()
-        ) && (discountEnd.getTime() >= end.getTime())){
-          temp.push(data);
-        }
+        if(!checkExpired(data, start, end))temp.push(data);
       }
       result = temp;
     }
