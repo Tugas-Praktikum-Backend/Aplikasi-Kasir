@@ -58,7 +58,7 @@ async function getEmployee(req, res, next) {
 
 async function updateEmployee(req, res, next) {
   try {
-    const id = req.params.id;
+    const id = req.params.employeeId;
     if (!id) throw Error('Missing id parameter');
     if(!req.body) throw Error('Missing body');
 
@@ -85,7 +85,7 @@ async function updateEmployee(req, res, next) {
 
 async function deleteEmployee(req, res, next) {
   try {
-    const id = req.params.id;
+    const id = req.params.employeeId;
     if (!id) throw new Error('Missing id parameter');
 
     const result = await db.deleteOne({ employeeId: id });

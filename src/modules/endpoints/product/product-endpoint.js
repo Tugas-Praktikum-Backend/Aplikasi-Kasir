@@ -89,7 +89,7 @@ async function updateProductsById(req, res, next) {
 
 async function deleteProducts(req, res, next) {
   try {
-    const id = req.params.proudctId;
+    const id = req.params.productId;
     if (!id || id === ':id') {
       throw Error('Missing id parameter');
     }
