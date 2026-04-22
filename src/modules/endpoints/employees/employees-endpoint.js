@@ -4,7 +4,8 @@ const { newToken } = require('../../middleware/middleware');
 
 async function addEmployee(req, res, next) {
   try {
-    const { employee_id, employee_name, employee_password } = req.body;
+    const { employee_name, employee_password } = req.body;
+    const employee_id = req.body.employee_id?.trim().toLowerCase();
     if (!employee_name || !employee_password || !employee_id) {
       throw Error('employeeName and employeePassword are required');
     }
@@ -42,7 +43,7 @@ async function getEmployees(req, res, next) {
 
 async function getEmployee(req, res, next) {
   try {
-    const id = req.params.employeeId;
+    const id = req.params.employeeId?.trim().toLowerCase();
     if (!id) throw Error('Missing id parameter');
 
     const employee = await db.findOne({ employeeId: id });
@@ -58,7 +59,7 @@ async function getEmployee(req, res, next) {
 
 async function updateEmployee(req, res, next) {
   try {
-    const id = req.params.id;
+    const id = req.params.employeeId?.trim().toLowerCase();
     if (!id) throw Error('Missing id parameter');
     if(!req.body) throw Error('Missing body');
 
@@ -85,7 +86,7 @@ async function updateEmployee(req, res, next) {
 
 async function deleteEmployee(req, res, next) {
   try {
-    const id = req.params.id;
+    const id = req.params.employeeId?.trim().toLowerCase();
     if (!id) throw new Error('Missing id parameter');
 
     const result = await db.deleteOne({ employeeId: id });
@@ -107,7 +108,8 @@ async function loginEmployee(req, res, next) {
     if (!req.body) {
       throw Error('employeeName and employeePassword are required');
     }
-    const { employee_id, employee_password } = req.body;
+    const { employee_password } = req.body;
+    const employee_id = req.params.employeeId?.trim().toLowerCase();
     if (!employee_id || !employee_password) {
       throw Error('employeeName and employeePassword are required');
     }

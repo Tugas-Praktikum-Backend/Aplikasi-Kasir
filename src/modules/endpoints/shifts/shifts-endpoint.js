@@ -1,14 +1,24 @@
 const route = require('express').Router();
 const db = require('../../database/database-manager').getDatabase('Shifts');
+const employeeDb = require('../../database/database-manager').getDatabase(
+  'Employees'
+);
 const mongoose = require('mongoose');
 
 async function startShift(req, res, next) {
   try {
-    const employeeId =
-      req.body.employeeId || new mongoose.Types.ObjectId().toString();
+    const employee_id = req.body.employee_id?.trim().toLowerCase();
+
+    const employeeExists = await employeeDb.findOne({
+      employeeId: employee_id,
+    });
+
+    if (!employeeExists) {
+      throw Error('Invalid employee_id (not found in Employees database)');
+    }
 
     const activeShift = await db.findOne({
-      employeeId: employeeId,
+      employeeId: employee_id,
       endTime: null,
     });
     if (activeShift) {
@@ -16,7 +26,7 @@ async function startShift(req, res, next) {
     }
 
     const result = await db.create({
-      employeeId: employeeId,
+      employeeId: employee_id,
       startTime: new Date(),
     });
 
@@ -26,7 +36,7 @@ async function startShift(req, res, next) {
 
     res.status(201).json({
       message: 'Shift started successfully',
-      employeeId: employeeId,
+      employeeId: employee_id,
       shiftId: result._id,
       startTime: result.startTime,
     });
@@ -37,14 +47,14 @@ async function startShift(req, res, next) {
 
 async function endShift(req, res, next) {
   try {
-    const employeeId = req.body.employeeId;
+    const employee_id = req.body.employee_id?.trim().toLowerCase();
 
-    if (!employeeId) {
-      throw Error('employeeId is required to end the shift');
+    if (!employee_id) {
+      throw Error('employee_id is required to end the shift');
     }
 
     const result = await db.findOneAndUpdate(
-      { employeeId: employeeId, endTime: null },
+      { employeeId: employee_id, endTime: null },
       { $set: { endTime: new Date() } },
       { new: true }
     );
@@ -71,10 +81,27 @@ async function getShifts(req, res, next) {
   }
 }
 
+async function getShiftsFromId(req, res, next) {
+  try {
+    const id = req.params.employeeId?.trim().toLowerCase();
+    if (!id || id === ':employeeId') {
+      throw Error('Missing id parameter');
+    }
+    const result = await db.find({ employeeId: id });
+    if (!result) {
+      throw Error('Employee not found');
+    }
+    res.status(200).json({ Shifts: result });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = (app) => {
   route.post('/', startShift);
   route.put('/', endShift);
   route.get('/', getShifts);
+  route.get('/:employeeId', getShiftsFromId);
 
   app.use('/shifts', route);
 };
