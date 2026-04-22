@@ -1,4 +1,4 @@
-# Backend Programming Template (2025)
+# Aplikasi Kasir 
 
 ## Development Setup
 
@@ -333,7 +333,7 @@ curl -X GET http://localhost:5000/api/employees/507f1f77bcf86cd799439013
 ```json
 {
   "message": "Successfully updated employee with id 507f1f77bcf86cd799439013",
-  "data": { ... }
+  "data": {}
 }
 ```
 
