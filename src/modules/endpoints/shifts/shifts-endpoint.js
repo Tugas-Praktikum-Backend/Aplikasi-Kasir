@@ -63,9 +63,15 @@ async function endShift(req, res, next) {
       throw Error('No active shift found for this employee');
     }
 
+    // New Feature: Calculate the duration of the shift
+    const durationMs = result.endTime - result.startTime;
+    const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
+    const durationMinutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+
     res.status(200).json({
       message: 'Shift ended successfully',
       shift: result,
+      duration: `${durationHours} hours, ${durationMinutes} minutes`
     });
   } catch (err) {
     next(err);
@@ -97,10 +103,24 @@ async function getShiftsFromId(req, res, next) {
   }
 }
 
+async function getActiveShifts(req, res, next) {
+  try {
+    const result = await db.find({ endTime: null });
+    
+    res.status(200).json({ 
+        message: 'Successfully retrieved active shifts',
+        activeShifts: result 
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = (app) => {
   route.post('/', startShift);
   route.put('/', endShift);
   route.get('/', getShifts);
+  route.get('/active', getActiveShifts);
   route.get('/:employeeId', getShiftsFromId);
 
   app.use('/shifts', route);
