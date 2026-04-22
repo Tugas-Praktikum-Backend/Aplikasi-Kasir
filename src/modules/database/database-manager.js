@@ -5,6 +5,7 @@ const list = [
   './customers/customers-schema',
   './employees/employees-schema',
   './shifts/shifts-schema',
+   './transaction/transaction-schema', 
 ];
 const loaded = {};
 let isLoaded = false;
