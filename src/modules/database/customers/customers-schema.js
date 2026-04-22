@@ -3,6 +3,7 @@ module.exports = (db) => ({
   model: db.model(
     'Customers',
     db.Schema({
+      customerId: { type: String, unique: true },
       customerName: { type: String, required: true },
       paymentMethod: {
         type: [

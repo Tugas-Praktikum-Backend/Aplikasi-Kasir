@@ -3,6 +3,10 @@ module.exports = (db) => ({
   model: db.model(
     'Employees',
     db.Schema({
+      employeeId: {
+        type: String,
+        unique: true,
+      },
       employeeName: {
         type: String,
         required: true,

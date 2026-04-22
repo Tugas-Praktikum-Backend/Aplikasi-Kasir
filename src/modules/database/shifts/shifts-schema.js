@@ -4,8 +4,8 @@ module.exports = (db) => ({
     'Shifts',
     db.Schema({
       employeeId: {
-        type: db.Schema.Types.ObjectId,
-        ref: 'Employee',
+        type: String,
+        ref: 'Employees',
         required: true,
       },
       startTime: { type: Date, default: Date.now },

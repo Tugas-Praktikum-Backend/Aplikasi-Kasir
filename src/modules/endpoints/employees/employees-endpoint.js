@@ -3,13 +3,14 @@ const db = require('../../database/database-manager').getDatabase('Employees');
 
 async function addEmployee(req, res, next) {
   try {
-    const { employeeName, employeePassword } = req.body;
+    const { employee_id, employee_name: employeeName, employee_password: employeePassword } = req.body;
 
-    if (!employeeName || !employeePassword) {
+    if (!employeeName || !employeePassword || !employeeId) {
       throw Error('employeeName and employeePassword are required');
     }
 
     const result = await db.create({
+      employeeId: employee_id,
       employeeName,
       employeePassword,
     });
@@ -76,7 +77,7 @@ async function deleteEmployee(req, res, next) {
     const id = req.params.id;
     if (!id) throw new Error('Missing id parameter');
 
-    const result = await db.deleteOne({ _id: id });
+    const result = await db.deleteOne({ employeeId: id });
 
     if (result.deletedCount === 0) {
       throw new Error(`Failed to delete employee with id ${id}`);
@@ -93,9 +94,9 @@ async function deleteEmployee(req, res, next) {
 module.exports = (app) => {
   route.post('/', addEmployee);
   route.get('/', getEmployees);
-  route.get('/:id', getEmployee);
-  route.put('/:id', updateEmployee);
-  route.delete('/:id', deleteEmployee);
+  route.get('/:employeeId', getEmployee);
+  route.put('/:employeeId', updateEmployee);
+  route.delete('/:employeeId', deleteEmployee);
 
   app.use('/employees', route);
 };

@@ -4,18 +4,16 @@ const db = require('../../database/database-manager').getDatabase('Customers');
 // Controller
 async function addCustomer(req, res, next) {
   try {
-    const customerName = req.body.customer_name?.trim().toLowerCase();
+    const customer_id = req.body.customer_id?.trim().toLowerCase();
+    const customer_name = req.body.customer_name;
 
-    if (!customerName) {
+    if (!customer_name) {
       throw Error('Name is required');
     }
 
-    if (await customerExists(customerName)) {
-      throw Error('Customer already exists');
-    }
-
     const result = await db.create({
-      customerName,
+      customerId: customer_id,
+      customerName: customer_name,
     });
 
     if (!result) {
@@ -31,12 +29,12 @@ async function addCustomer(req, res, next) {
 
 async function deleteCustomer(req, res, next) {
   try {
-    const id = req.params.id;
-    if (!id || id === ':productId') {
+    const id = req.params.customerId;
+    if (!id || id === ':id') {
       throw Error('Missing id parameter');
     }
 
-    const result = await db.deleteOne({ _id: id });
+    const result = await db.deleteOne({ customerId: id });
     if (!result) {
       throw Error(`Failed to delete customer with id ${id}`);
     }
@@ -51,11 +49,7 @@ async function deleteCustomer(req, res, next) {
 async function getCustomers(req, res, next) {
   try {
     const result = await db.find({});
-    const customers = result.map((c) => ({
-      id: c._id,
-      customer_name: c.customerName,
-      payment_method: c.paymentMethod,
-    }));
+    const customers = await db.find();
     res.status(200).json({ customers });
   } catch (err) {
     next(err);
@@ -64,11 +58,11 @@ async function getCustomers(req, res, next) {
 
 async function getCustomer(req, res, next) {
   try {
-    const id = req.params.id;
+    const id = req.params.customerId;
     if (!id || id === ':productId') {
       throw Error('Missing id parameter');
     }
-    const result = await db.findOne({ _id: id });
+    const result = await db.findOne({ customerId: id });
     if (!result) {
       throw Error('Customer not found');
     }
@@ -82,7 +76,7 @@ async function updateCustomer(req, res, next) {
   try {
     const customerName = req.body.customer_name?.trim().toLowerCase();
 
-    const id = req.params.id;
+    const id = req.params.customerId;
     if (!id || id === ':productId') {
       throw Error('Missing id parameter');
     }
@@ -92,7 +86,7 @@ async function updateCustomer(req, res, next) {
     }
 
     const result = await db.findOneAndUpdate(
-      { _id: id },
+      { customerId: id },
       { $set: { customerName } }
     );
     if (!result) {
@@ -109,14 +103,28 @@ async function updateCustomer(req, res, next) {
 async function addPayment(req, res, next) {
   try {
     const provider = req.body.provider?.trim().toUpperCase();
-    const id = req.params.id;
+    const id = req.params.customerId;
 
     if (!provider) {
       throw Error('Provider is required');
     }
 
+    const ALLOWED_PROVIDERS = [
+      'OVO',
+      'GOPAY',
+      'DANA',
+      'SHOPEEPAY',
+      'BRI',
+      'MANDIRI',
+      'BNI',
+    ];
+
+    if (!ALLOWED_PROVIDERS.includes(provider)) {
+      throw Error(`Invalid provider. Allowed: ${ALLOWED_PROVIDERS.join(', ')}`);
+    }
+
     const result = await db.updateOne(
-      { '_id': id, 'paymentMethod.provider': { $ne: provider } },
+      { 'customerId': id, 'paymentMethod.provider': { $ne: provider } },
       { $push: { paymentMethod: { provider, balance: 0 } } }
     );
 
@@ -138,13 +146,16 @@ async function topUp(req, res, next) {
   try {
     const provider = req.body.provider?.trim().toUpperCase();
     const amount = Number(req.body.amount);
-    const id = req.params.id;
+    const id = req.params.customerId;
+    if (!id || id === ':productId') {
+      throw Error('Missing id parameter');
+    }
 
     if (!provider) {
       throw Error('Provider is required');
     }
 
-    const customer = await db.findById(id);
+    const customer = await db.findOne({ customerId: id });
     if (!customer) {
       throw Error('Customer not found');
     }
@@ -158,11 +169,11 @@ async function topUp(req, res, next) {
       throw Error('Amount must be greater than 0');
     }
     const result = await db.updateOne(
-      { '_id': id, 'paymentMethod.provider': provider },
+      { 'customerId': id, 'paymentMethod.provider': provider },
       { $inc: { 'paymentMethod.$.balance': amount } }
     );
 
-    const updated = await db.findById(id);
+    const updated = await db.findOne({ customerId: id });
     const updatedPayment = updated.paymentMethod.find(
       (p) => p.provider === provider
     );
@@ -182,14 +193,14 @@ async function topUp(req, res, next) {
 async function deletePayment(req, res, next) {
   try {
     const provider = req.body.provider?.trim().toUpperCase();
-    const id = req.params.id;
+    const id = req.params.customerId;
 
     if (!provider) {
       throw Error('Provider is required');
     }
 
     const result = await db.updateOne(
-      { '_id': id, 'paymentMethod.provider': provider },
+      { 'customerId': id, 'paymentMethod.provider': provider },
       { $pull: { paymentMethod: { provider } } }
     );
 
@@ -208,24 +219,25 @@ async function deletePayment(req, res, next) {
     next(err);
   }
 }
-// Service
-async function customerExists(customerName) {
-  const user = await db.findOne({
-    customerName: customerName.trim().toLowerCase(),
-  });
-  return !!user;
+
+async function getTransaction(res, req, next) {
+  try {
+  } catch (err) {
+    next(err);
+  }
 }
 
 // Route
 module.exports = (app) => {
   route.post('/', addCustomer);
   route.get('/', getCustomers);
-  route.get('/:id', getCustomer);
-  route.put('/:id', updateCustomer);
-  route.put('/:id/topup', topUp);
-  route.put('/:id/payment', addPayment);
-  route.delete('/:id/payment', deletePayment);
-  route.delete('/:id', deleteCustomer);
+  route.get('/:customerId', getCustomer);
+  route.put('/:customerId', updateCustomer);
+  route.put('/:customerId/topup', topUp);
+  route.put('/:customerId/payment', addPayment);
+  route.delete('/:customerId/payment', deletePayment);
+  route.delete('/:customerId', deleteCustomer);
+  // route.get('/:customerId/transactions', getTransactions);
 
   app.use('/customers', route);
 };
