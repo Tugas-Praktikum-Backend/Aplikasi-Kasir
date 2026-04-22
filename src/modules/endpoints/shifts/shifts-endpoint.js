@@ -103,10 +103,24 @@ async function getShiftsFromId(req, res, next) {
   }
 }
 
+async function getActiveShifts(req, res, next) {
+  try {
+    const result = await db.find({ endTime: null });
+    
+    res.status(200).json({ 
+        message: 'Successfully retrieved active shifts',
+        activeShifts: result 
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = (app) => {
   route.post('/', startShift);
   route.put('/', endShift);
   route.get('/', getShifts);
+  route.get('/active', getActiveShifts);
   route.get('/:employeeId', getShiftsFromId);
 
   app.use('/shifts', route);
