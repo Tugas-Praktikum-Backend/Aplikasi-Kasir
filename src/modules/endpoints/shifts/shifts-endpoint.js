@@ -4,11 +4,11 @@ const mongoose = require('mongoose');
 
 async function startShift(req, res, next) {
   try {
-    const employeeId =
-      req.body.employeeId || new mongoose.Types.ObjectId().toString();
+    const employee_id =
+      req.body.employee_id;
 
     const activeShift = await db.findOne({
-      employeeId: employeeId,
+      employeeId: employee_id,
       endTime: null,
     });
     if (activeShift) {
@@ -16,7 +16,7 @@ async function startShift(req, res, next) {
     }
 
     const result = await db.create({
-      employeeId: employeeId,
+      employeeId: employee_id,
       startTime: new Date(),
     });
 
@@ -37,14 +37,14 @@ async function startShift(req, res, next) {
 
 async function endShift(req, res, next) {
   try {
-    const employeeId = req.body.employeeId;
+    const employee_id = req.body.employee_id;
 
-    if (!employeeId) {
-      throw Error('employeeId is required to end the shift');
+    if (!employee_id) {
+      throw Error('employee_id is required to end the shift');
     }
 
     const result = await db.findOneAndUpdate(
-      { employeeId: employeeId, endTime: null },
+      { employeeId: employee_id, endTime: null },
       { $set: { endTime: new Date() } },
       { new: true }
     );
