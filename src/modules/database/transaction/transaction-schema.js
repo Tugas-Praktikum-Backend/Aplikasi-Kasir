@@ -47,6 +47,10 @@ module.exports = (db) => ({
         type: Number,
         default: 0,
       },
+      priceAfterDiscounts: {
+        type: Number,
+        default: 0,
+      },
       paymentMethod: {
         type: String,
         required: true,

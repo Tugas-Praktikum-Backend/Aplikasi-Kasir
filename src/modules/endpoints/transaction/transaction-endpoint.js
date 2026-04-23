@@ -121,9 +121,10 @@ async function addTransactions(req, res, next) {
     });
 
     let totalPrice = 0;
-    let discountList = discountDb.find({});
+    let beforeDiscount = 0;
+    let discountList = await discountDb.find({});
     discountList = discountList.map((data) => {
-      if(!checkExpired(data))return undefined;
+      if(checkExpired(data))return undefined;
       return {
         productList: JSON.parse(data.products),
         discountAmount: data.discountAmount
@@ -164,10 +165,12 @@ async function addTransactions(req, res, next) {
       let subtotal = productPrice * amount;
       let discountTotal = 0;
       for(const discount of discountList){
-        if(discount && discount.productList.products.find(normalizedId)){
+        if(discount && discount.productList.find((e) => e === normalizedId)){
           discountTotal += discount.discountAmount;
         }
       }
+
+      beforeDiscount += subtotal;
 
       totalPrice += (subtotal * (1 - Math.min(1, discountTotal)));
 
@@ -198,7 +201,8 @@ async function addTransactions(req, res, next) {
       employeeId: employee_id,
       customerId: customer_id,
       purchaseList: finalPurchaseList,
-      price: totalPrice,
+      price: beforeDiscount,
+      priceAfterDiscounts: totalPrice,
       adminFee: adminFee,
       finalPrice: finalPrice,
     });
