@@ -18,6 +18,10 @@ async function getDiscounts(req, res, next) {
       for (const data of result) {
         if (!checkExpired(data, start, end)) temp.push(data);
       }
+      temp.map((e) => {
+        e.discountStart = (new Date(e.discountStart * 1000)).toLocaleDateString("id-ID");
+        return e;
+      });
       result = temp;
     }
     return res.status(201).json({ discounts: result });
@@ -56,7 +60,7 @@ async function deleteDiscount(req, res, next) {
   try {
     const id = req.params.id;
     if (!id || id === ':id') {
-      throw Error('Missing ID parameter');
+      throw Error('Missing id parameter');
     }
     const result = await db.deleteOne({ _id: id });
     if (!result) {
@@ -80,6 +84,7 @@ async function getDiscountById(req, res, next) {
     if (!result || result.length <= 0) {
       throw Error('Invalid discount ID');
     }
+    result.discountStart = (new Date(result.discountStart * 1000)).toLocaleDateString("id-ID");
     res.status(201).json({ discounts: result });
   } catch (err) {
     next(err);
@@ -112,7 +117,7 @@ async function updateDiscount(req, res, next) {
     }
     return res
       .status(201)
-      .json({ message: `Successfully updated discount data with id ${id}` });
+      .json({ message: 'Successfully updated discount data' });
   } catch (err) {
     next(err);
   }
