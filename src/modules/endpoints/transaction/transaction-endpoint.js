@@ -1,24 +1,12 @@
 const route = require('express').Router();
 const dbManager = require('../../database/database-manager');
-const {checkExpired} = require("../../../utils/discountUtils");
-const db = dbManager.getDatabase(
-  'Transaction'
-);
-const productDb = dbManager.getDatabase(
-  'Products'
-);
-const employeeDb = dbManager.getDatabase(
-  'Employees'
-);
-const customerDb = dbManager.getDatabase(
-  'Customers'
-);
-const shiftDb = dbManager.getDatabase(
-  'Shifts'
-);
-const discountDb = dbManager.getDatabase(
-  'Discounts'
-);
+const { checkExpired } = require('../../../utils/discountUtils');
+const db = dbManager.getDatabase('Transaction');
+const productDb = dbManager.getDatabase('Products');
+const employeeDb = dbManager.getDatabase('Employees');
+const customerDb = dbManager.getDatabase('Customers');
+const shiftDb = dbManager.getDatabase('Shifts');
+const discountDb = dbManager.getDatabase('Discounts');
 
 const ADMIN_FEES = {
   BCA: 2500,
@@ -41,7 +29,7 @@ async function addTransactions(req, res, next) {
     const purchase_list = req.body.purchase_list;
 
     if (!employee_id || !customer_id || !payment_method) {
-      throw Error('Transactions data are missing!');
+      throw Error('Transaction data are missing!');
     }
 
     const employee = await employeeDb.findOne({
@@ -49,7 +37,7 @@ async function addTransactions(req, res, next) {
     });
 
     if (!employee) {
-      throw Error(`Employee not found: ${employee_id}`);
+      throw Error(`Employee with ID ${employee_id} not found`);
     }
 
     const activeShift = await shiftDb.findOne({
@@ -59,7 +47,7 @@ async function addTransactions(req, res, next) {
 
     if (!activeShift) {
       throw Error(
-        `Transaction denied: Employee ${employee_id} is not currently on duty. Please start a shift first.`
+        `Transaction denied: Employee with ID ${employee_id} is not currently on duty. Please start a shift first.`
       );
     }
 
@@ -68,7 +56,7 @@ async function addTransactions(req, res, next) {
     });
 
     if (!customer) {
-      throw Error(`Customer not found: ${customer_id}`);
+      throw Error(`Customer with ID ${customer_id} not found`);
     }
 
     if (!Array.isArray(customer.paymentMethod)) {
@@ -80,23 +68,23 @@ async function addTransactions(req, res, next) {
     );
 
     if (!payment) {
-      throw Error(`Customer does not have payment method: ${payment_method}`);
+      throw Error(`Customer does not have payment method ${payment_method}`);
     }
 
     if (!Array.isArray(purchase_list) || purchase_list.length === 0) {
-      throw Error('purchase_list must be a non-empty array');
+      throw Error('Purchase list must be a non-empty array');
     }
     purchase_list.forEach((item) => {
       if (!item.product_id) {
-        throw Error('product_id is required');
+        throw Error('Product ID is required');
       }
       if (Number(item.product_amount) <= 0) {
-        throw Error(`Invalid amount for product: ${item.product_id}`);
+        throw Error(`Invalid amount for product ID ${item.product_id}`);
       }
     });
     const productIds = purchase_list.map((p) => {
       if (!p.product_id) {
-        throw Error('product_id is required');
+        throw Error('Product ID is required');
       }
       return p.product_id.toUpperCase().trim();
     });
@@ -124,10 +112,10 @@ async function addTransactions(req, res, next) {
     let beforeDiscount = 0;
     let discountList = await discountDb.find({});
     discountList = discountList.map((data) => {
-      if(checkExpired(data))return undefined;
+      if (checkExpired(data)) return undefined;
       return {
         productList: JSON.parse(data.products),
-        discountAmount: data.discountAmount
+        discountAmount: data.discountAmount,
       };
     });
 
@@ -139,18 +127,18 @@ async function addTransactions(req, res, next) {
       const product = productMap[normalizedId];
 
       if (!product) {
-        throw Error(`Product not found: ${item.product_id}`);
+        throw Error(`Product not found with ID ${item.product_id}`);
       }
 
       const amount = Number(item.product_amount);
 
       if (!amount || amount <= 0) {
-        throw Error(`Invalid amount for product: ${item.product_id}`);
+        throw Error(`Invalid amount for product ID ${item.product_id}`);
       }
 
       if (product.productStock < amount) {
         throw Error(
-          `Insufficient stock for product ${product.productId}. Requested: ${amount}, Available: ${product.productStock}`
+          `Insufficient stock for product ID ${product.productId}. Requested: ${amount}, Available: ${product.productStock}`
         );
       }
 
@@ -159,20 +147,22 @@ async function addTransactions(req, res, next) {
       const productPrice = product.productPrice;
 
       if (productPrice === undefined) {
-        throw Error(`Product price missing: ${product.productId}`);
+        throw Error(
+          `Product price missing from product ID ${product.productId}`
+        );
       }
 
       let subtotal = productPrice * amount;
       let discountTotal = 0;
-      for(const discount of discountList){
-        if(discount && discount.productList.find((e) => e === normalizedId)){
+      for (const discount of discountList) {
+        if (discount && discount.productList.find((e) => e === normalizedId)) {
           discountTotal += discount.discountAmount;
         }
       }
 
       beforeDiscount += subtotal;
 
-      totalPrice += (subtotal * (1 - Math.min(1, discountTotal)));
+      totalPrice += subtotal * (1 - Math.min(1, discountTotal));
 
       return {
         productId: normalizedId,
@@ -213,7 +203,9 @@ async function addTransactions(req, res, next) {
 
     await customer.save();
     await Promise.all(products.map((product) => product.save()));
-    res.status(201).json({ message: 'Successfully added new Transactions' });
+    res
+      .status(201)
+      .json({ message: 'Successfully added new Transactions', data: result });
   } catch (err) {
     next(err);
   }

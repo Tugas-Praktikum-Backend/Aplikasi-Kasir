@@ -56,7 +56,7 @@ async function deleteDiscount(req, res, next) {
   try {
     const id = req.params.id;
     if (!id || id === ':id') {
-      throw Error('Missing id parameter');
+      throw Error('Missing ID parameter');
     }
     const result = await db.deleteOne({ _id: id });
     if (!result) {
@@ -112,7 +112,7 @@ async function updateDiscount(req, res, next) {
     }
     return res
       .status(201)
-      .json({ message: 'Successfully updated discount data' });
+      .json({ message: `Successfully updated discount data with id ${id}` });
   } catch (err) {
     next(err);
   }

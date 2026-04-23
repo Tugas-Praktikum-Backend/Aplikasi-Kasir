@@ -31,7 +31,7 @@ async function deleteCustomer(req, res, next) {
   try {
     const id = req.params.customerId?.trim().toLowerCase();
     if (!id || id === ':id') {
-      throw Error('Missing id parameter');
+      throw Error('Missing ID parameter');
     }
 
     const result = await db.deleteOne({ customerId: id });
@@ -60,7 +60,7 @@ async function getCustomer(req, res, next) {
   try {
     const id = req.params.customerId?.trim().toLowerCase();
     if (!id || id === ':customerId') {
-      throw Error('Missing id parameter');
+      throw Error('Missing ID parameter');
     }
     const result = await db.findOne({ customerId: id });
     if (!result) {
@@ -78,7 +78,7 @@ async function updateCustomer(req, res, next) {
 
     const id = req.params.customerId?.trim().toLowerCase();
     if (!id || id === ':customerId') {
-      throw Error('Missing id parameter');
+      throw Error('Missing ID parameter');
     }
 
     if (!customerName) {
@@ -136,7 +136,7 @@ async function addPayment(req, res, next) {
       throw Error('Payment already exists');
     }
 
-    res.status(200).json({ message: 'Payment method added' });
+    res.status(200).json({ message: `Payment method ${provider} added` });
   } catch (err) {
     next(err);
   }
@@ -148,7 +148,7 @@ async function topUp(req, res, next) {
     const amount = Number(req.body.amount);
     const id = req.params.customerId?.trim().toLowerCase();
     if (!id || id === ':customerId') {
-      throw Error('Missing id parameter');
+      throw Error('Missing ID parameter');
     }
 
     if (!provider) {

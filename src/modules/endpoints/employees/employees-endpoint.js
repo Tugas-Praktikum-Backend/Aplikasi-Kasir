@@ -7,7 +7,7 @@ async function addEmployee(req, res, next) {
     const { employee_name, employee_password } = req.body;
     const employee_id = req.body.employee_id?.trim().toLowerCase();
     if (!employee_name || !employee_password || !employee_id) {
-      throw Error('employeeName and employeePassword are required');
+      throw Error('Employee name and password are required');
     }
 
     const result = await db.create({
@@ -33,8 +33,7 @@ async function getEmployees(req, res, next) {
     const employees = await db.find();
 
     res.status(200).json({
-      message: 'Successfully retrieved all employees',
-      data: employees,
+      employees,
     });
   } catch (err) {
     next(err);
@@ -44,7 +43,7 @@ async function getEmployees(req, res, next) {
 async function getEmployee(req, res, next) {
   try {
     const id = req.params.employeeId?.trim().toLowerCase();
-    if (!id) throw Error('Missing id parameter');
+    if (!id) throw Error('Missing ID parameter');
 
     const employee = await db.findOne({ employeeId: id });
 
@@ -60,7 +59,7 @@ async function getEmployee(req, res, next) {
 async function updateEmployee(req, res, next) {
   try {
     const id = req.params.employeeId?.trim().toLowerCase();
-    if (!id) throw Error('Missing id parameter');
+    if (!id) throw Error('Missing ID parameter');
     if (!req.body) throw Error('Missing body');
 
     const employee_name = req.body.employee_name;
@@ -109,7 +108,7 @@ async function loginEmployee(req, res, next) {
 
     const normalizedId = employee_id?.trim().toLowerCase();
     if (!normalizedId || !employee_password) {
-      throw Error('employeeId and employeePassword are required');
+      throw Error('Employee ID and password are required');
     }
 
     const result = await db.findOne({

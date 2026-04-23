@@ -50,7 +50,7 @@ async function endShift(req, res, next) {
     const employee_id = req.body.employee_id?.trim().toLowerCase();
 
     if (!employee_id) {
-      throw Error('employee_id is required to end the shift');
+      throw Error('Employee ID is required to end the shift');
     }
 
     const result = await db.findOneAndUpdate(
@@ -66,12 +66,14 @@ async function endShift(req, res, next) {
     // New Feature: Calculate the duration of the shift
     const durationMs = result.endTime - result.startTime;
     const durationHours = Math.floor(durationMs / (1000 * 60 * 60));
-    const durationMinutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+    const durationMinutes = Math.floor(
+      (durationMs % (1000 * 60 * 60)) / (1000 * 60)
+    );
 
     res.status(200).json({
       message: 'Shift ended successfully',
       shift: result,
-      duration: `${durationHours} hours, ${durationMinutes} minutes`
+      duration: `${durationHours} hours, ${durationMinutes} minutes`,
     });
   } catch (err) {
     next(err);
@@ -91,7 +93,7 @@ async function getShiftsFromId(req, res, next) {
   try {
     const id = req.params.employeeId?.trim().toLowerCase();
     if (!id || id === ':employeeId') {
-      throw Error('Missing id parameter');
+      throw Error('Missing ID parameter');
     }
     const result = await db.find({ employeeId: id });
     if (!result) {
@@ -106,10 +108,10 @@ async function getShiftsFromId(req, res, next) {
 async function getActiveShifts(req, res, next) {
   try {
     const result = await db.find({ endTime: null });
-    
-    res.status(200).json({ 
-        message: 'Successfully retrieved active shifts',
-        activeShifts: result 
+
+    res.status(200).json({
+      message: 'Successfully retrieved active shifts',
+      activeShifts: result,
     });
   } catch (err) {
     next(err);

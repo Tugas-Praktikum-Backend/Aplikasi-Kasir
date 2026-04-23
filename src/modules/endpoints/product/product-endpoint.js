@@ -6,17 +6,14 @@ async function addProducts(req, res, next) {
     if (!req.body) {
       throw Error('Products data are missing!');
     }
-    const {
-      product_name,
-      product_price,
-    } = req.body;
+    const { product_name, product_price } = req.body;
 
     const product_id = req.body.product_id?.trim().toUpperCase();
 
     if (!product_id || !product_name || product_price === undefined) {
       throw Error('Products data are missing!');
     }
-    
+
     const result = await db.create({
       productId: product_id,
       productName: product_name,
@@ -25,7 +22,9 @@ async function addProducts(req, res, next) {
     if (!result) {
       throw Error('Failed to create Products data');
     }
-    res.status(201).json({ message: 'Successfully added new Products' });
+    res
+      .status(201)
+      .json({ message: 'Successfully added new Products', data: result });
   } catch (err) {
     next(err);
   }
@@ -48,7 +47,7 @@ async function getProductsById(req, res, next) {
   try {
     const id = req.params.productId?.trim().toUpperCase();
     if (!id || id === ':id') {
-      throw Error('Missing id parameter');
+      throw Error('Missing ID parameter');
     }
     const result = await db.findOne({ productId: id });
     if (!result) {
@@ -64,12 +63,10 @@ async function updateProductsById(req, res, next) {
   try {
     const id = req.params.productId?.trim().toUpperCase();
     if (!id || id === ':id') {
-      throw Error('Missing id parameter');
+      throw Error('Missing ID parameter');
     }
 
     const { product_name, product_price } = req.body;
-
-    
 
     const result = await db.findOneAndUpdate(
       { productId: id },
@@ -93,7 +90,7 @@ async function deleteProducts(req, res, next) {
   try {
     const id = req.params.productId?.trim().toUpperCase();
     if (!id || id === ':id') {
-      throw Error('Missing id parameter');
+      throw Error('Missing ID parameter');
     }
 
     const result = await db.deleteOne({ productId: id });
@@ -113,7 +110,7 @@ async function updateProductsStock(req, res, next) {
   try {
     const id = req.params.productId?.trim().toUpperCase();
     if (!id || id === ':id') {
-      throw Error('Missing id parameter');
+      throw Error('Missing ID parameter');
     }
 
     const { product_stock } = req.body;
