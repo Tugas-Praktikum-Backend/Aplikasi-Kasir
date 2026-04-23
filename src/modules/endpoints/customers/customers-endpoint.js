@@ -1,5 +1,6 @@
 const route = require('express').Router();
 const db = require('../../database/database-manager').getDatabase('Customers');
+const transactionDb = require('../../database/database-manager').getDatabase('Transactions');
 
 // Controller
 async function addCustomer(req, res, next) {
@@ -220,12 +221,32 @@ async function deletePayment(req, res, next) {
   }
 }
 
-async function getTransaction(res, req, next) {
+async function getTransaction(req, res, next) {
   try {
+    const id = req.params.customerId?.trim().toLowerCase();
+
+    if (!id || id === ':customerId') {
+      throw Error('Missing ID parameter');
+    }
+
+    const customer = await db.findOne({ customerId: id });
+    if (!customer) {
+      throw Error('Customer not found');
+    }
+
+    const transactions = await transactionDb.find({ customerId: id });
+
+    res.status(200).json({
+      customerId: id,
+      totalTransactions: transactions.length,
+      transactions,
+    });
   } catch (err) {
     next(err);
   }
 }
+
+
 
 // Route
 module.exports = (app) => {
@@ -237,7 +258,7 @@ module.exports = (app) => {
   route.put('/:customerId/payment', addPayment);
   route.delete('/:customerId/payment', deletePayment);
   route.delete('/:customerId', deleteCustomer);
-  // route.get('/:customerId/transactions', getTransactions);
+  route.get('/:customerId/transactions', getTransaction);
 
   app.use('/customers', route);
 };

@@ -1,6 +1,7 @@
 const route = require('express').Router();
 const db = require('../../database/database-manager').getDatabase('Employees');
 const { newToken } = require('../../middleware/middleware');
+const transactionDb = require('../../database/database-manager').getDatabase('Transactions');
 
 async function addEmployee(req, res, next) {
   try {
@@ -131,10 +132,37 @@ async function loginEmployee(req, res, next) {
   }
 }
 
+async function getTransactions(req, res, next) {
+  try {
+    const id = req.params.employeeId?.trim().toLowerCase();
+
+    if (!id || id === ':employeeId') {
+      throw Error('Missing ID parameter');
+    }
+
+    // optional: check if customer exists (so you don't return empty and confuse yourself later)
+    const employee = await db.findOne({ employeeId: id });
+    if (!employee) {
+      throw Error('Employee not found');
+    }
+
+    const transactions = await transactionDb.find({ employeeId: id });
+
+    res.status(200).json({
+      employeeId: id,
+      totalTransactions: transactions.length,
+      transactions,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = (app) => {
   route.post('/', addEmployee);
   route.get('/', getEmployees);
   route.get('/:employeeId', getEmployee);
+  route.get('/:employeeId/transaction', getTransactions);
   route.put('/:employeeId', updateEmployee);
   route.delete('/:employeeId', deleteEmployee);
   route.post('/login', loginEmployee);
