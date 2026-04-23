@@ -11,12 +11,12 @@ async function getDiscounts(req, res, next) {
 
     let start = req.query.start;
     let end = req.query.end;
-    if(start && end){
+    if (start && end) {
       let temp = [];
       start = new Date(Date.parse(start));
       end = new Date(Date.parse(end));
-      for(const data of result){
-        if(!checkExpired(data, start, end))temp.push(data);
+      for (const data of result) {
+        if (!checkExpired(data, start, end)) temp.push(data);
       }
       result = temp;
     }
@@ -31,15 +31,17 @@ async function addDiscount(req, res, next) {
     if (!req.body) {
       throw Error('Missing body!');
     }
-    const { products, discountAmount, discountDuration } = req.body;
-    if(!products || !discountAmount || !discountDuration){
-      throw Error('Products, discount amount, and discount duration are required');
+    const { products, discount_amount, discount_duration } = req.body;
+    if (!products || !discount_amount || !discount_duration) {
+      throw Error(
+        'Products, discount amount, and discount duration are required'
+      );
     }
     const result = await db.create({
       products: JSON.stringify(products),
-      discountAmount: discountAmount,
+      discountAmount: discount_amount,
       discountStart: Math.floor(Date.now() / 1000),
-      discountDuration: discountDuration
+      discountDuration: discount_duration,
     });
     if (!result) {
       throw Error('Failed to add new discount');
@@ -68,7 +70,7 @@ async function deleteDiscount(req, res, next) {
   }
 }
 
-async function getDiscountById(req, res, next){
+async function getDiscountById(req, res, next) {
   try {
     if (!req.body) {
       throw Error('Missing body!');
@@ -84,29 +86,33 @@ async function getDiscountById(req, res, next){
   }
 }
 
-async function updateDiscount(req, res, next){
+async function updateDiscount(req, res, next) {
   try {
-    if(!req.params.id)throw Error('Invalid discount ID');
+    if (!req.params.id) throw Error('Invalid discount ID');
 
     if (!req.body) {
       throw Error('Missing body!');
     }
-    const { products, discountAmount, discountDuration } = req.body;
+    const { products, discount_amount, discount_duration } = req.body;
     const result = await db.find({ _id: req.params.id });
     if (!result || result.length <= 0) {
       throw Error('Invalid discount ID');
     }
     const lastData = result[0];
     const data = {
-      _id: req.params.id ?? lastData["_id"],
-      products: JSON.stringify(products) ?? lastData["products"],
-      discountAmount: discountAmount ?? lastData["discountAmount"],
-      discountDuration: discountDuration ?? lastData["discountDuration"]
+      _id: req.params.id ?? lastData['_id'],
+      products: JSON.stringify(products) ?? lastData['products'],
+      discountAmount: discount_amount ?? lastData['discountAmount'],
+      discountDuration: discount_duration ?? lastData['discountDuration'],
     };
-    if(!await db.updateOne(data)){
-      return res.status(201).json({ message: 'Failed to update the discount data' });
+    if (!(await db.updateOne(data))) {
+      return res
+        .status(201)
+        .json({ message: 'Failed to update the discount data' });
     }
-    return res.status(201).json({ message: 'Successfully updated discount data' });
+    return res
+      .status(201)
+      .json({ message: 'Successfully updated discount data' });
   } catch (err) {
     next(err);
   }
