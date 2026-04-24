@@ -2,6 +2,7 @@ const route = require('express').Router();
 const db = require('../../database/database-manager').getDatabase('Employees');
 const { newToken } = require('../../middleware/middleware');
 const transactionDb = require('../../database/database-manager').getDatabase('Transactions');
+const { hashPassword, passwordMatched } = require('../../../utils/password');
 
 async function addEmployee(req, res, next) {
   try {
@@ -11,10 +12,16 @@ async function addEmployee(req, res, next) {
       throw Error('Employee name and password are required');
     }
 
+    if (!employee_password || employee_password.length < 8) {
+      throw Error('Password must be at least 8 characters long');
+    }
+
+    const hashedPassword = await hashPassword(employee_password);
+    
     const result = await db.create({
       employeeId: employee_id,
       employeeName: employee_name,
-      employeePassword: employee_password,
+      employeePassword: hashedPassword,
     });
 
     if (!result) {
@@ -112,20 +119,24 @@ async function loginEmployee(req, res, next) {
       throw Error('Employee ID and password are required');
     }
 
-    const result = await db.findOne({
-      employeeId: normalizedId,
-      employeePassword: employee_password,
-    });
-    if (!result) {
-      return res.status(401).json({
-        message: `Authorization failed`,
-      });
+    const employee = await db.findOne({ employeeId: normalizedId });
+    if (!employee) {
+        return res.status(401).json({
+            message: 'Authorization failed'
+        });
     }
 
-    const token = newToken(result.employeeName);
+    const isPasswordMatch = await passwordMatched(employee_password, employee.employeePassword);
+    if (!isPasswordMatch) {
+        return res.status(401).json({
+            message: 'Authorization failed'
+        });
+    }
+
+    const token = newToken(employee.employeeName || employee.employee_id);
     return res.status(200).json({
-      message: `Authorization successfully`,
-      token: token,
+        message: 'Authorization successfully',
+        token: token,
     });
   } catch (err) {
     next(err);

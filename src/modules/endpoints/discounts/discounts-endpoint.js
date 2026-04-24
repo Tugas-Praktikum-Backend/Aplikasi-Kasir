@@ -18,10 +18,6 @@ async function getDiscounts(req, res, next) {
       for (const data of result) {
         if (!checkExpired(data, start, end)) temp.push(data);
       }
-      temp.map((e) => {
-        e.discountStart = (new Date(e.discountStart * 1000)).toLocaleDateString("id-ID");
-        return e;
-      });
       result = temp;
     }
     return res.status(201).json({ discounts: result });
@@ -76,15 +72,13 @@ async function deleteDiscount(req, res, next) {
 
 async function getDiscountById(req, res, next) {
   try {
-    if (!req.body) {
-      throw Error('Missing body!');
+    if (!req.params.id) {
+      throw Error('Invalid discount ID!');
     }
-    const { _id } = req.body;
-    const result = await db.find({ _id });
+    const result = await db.find({ _id: req.params.id });
     if (!result || result.length <= 0) {
       throw Error('Invalid discount ID');
     }
-    result.discountStart = (new Date(result.discountStart * 1000)).toLocaleDateString("id-ID");
     res.status(201).json({ discounts: result });
   } catch (err) {
     next(err);
