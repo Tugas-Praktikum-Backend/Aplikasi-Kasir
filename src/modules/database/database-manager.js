@@ -11,12 +11,14 @@ const loaded = {};
 let isLoaded = false;
 
 function init() {
+  console.log('Loading mongoose...');
   mongoose.connect(process.env.MONGO_URI, {dbName: 'kasir'}).then((r) => {
     for (const schemaPath of list) {
       const result = require(schemaPath)(mongoose);
       loaded[result.id] = result.model;
     }
     isLoaded = true;
+    console.log("Mongoose has been loaded");
   });
 }
 
