@@ -20,7 +20,14 @@ async function getDiscounts(req, res, next) {
       }
       result = temp;
     }
-    return res.status(201).json({ discounts: result });
+    
+    let finalResults = [];
+    for(const data of result){
+      let d = [];
+      data.forEach((e, k) => d[k] = e)
+      finalResults.push(d)
+    }
+    return res.status(201).json({ discounts: finalResults });
   } catch (err) {
     next(err);
   }
