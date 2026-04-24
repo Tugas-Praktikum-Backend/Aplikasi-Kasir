@@ -125,8 +125,8 @@ async function updateDiscount(req, res, next) {
 }
 
 module.exports = (app) => {
-  route.get('/', getDiscounts);
   route.post('/', addDiscount);
+  route.get('/', getDiscounts);
   route.get('/:id', getDiscountById);
   route.patch('/:id', updateDiscount);
   route.delete('/:id', deleteDiscount);
