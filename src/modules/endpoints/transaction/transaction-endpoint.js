@@ -231,7 +231,7 @@ async function getTransactionsToday(req, res, next) {
     const current = new Date(Date.now());
     transactions.forEach((data) => {
       if(current.getDate() === data.transactionDate.getDate()){
-        list.push(current);
+        list.push(data);
       }
     })
 
