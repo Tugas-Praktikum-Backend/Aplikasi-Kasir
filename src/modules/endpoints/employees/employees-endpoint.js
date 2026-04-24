@@ -173,7 +173,7 @@ module.exports = (app) => {
   route.post('/', addEmployee);
   route.get('/', getEmployees);
   route.get('/:employeeId', getEmployee);
-  route.get('/:employeeId/transaction', getTransactions);
+  route.get('/:employeeId/transactions', getTransactions);
   route.put('/:employeeId', updateEmployee);
   route.delete('/:employeeId', deleteEmployee);
   route.post('/login', loginEmployee);
