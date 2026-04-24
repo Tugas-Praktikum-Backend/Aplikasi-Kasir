@@ -224,10 +224,43 @@ async function getTransactions(req, res, next) {
   }
 }
 
+async function getTransactionsToday(req, res, next) {
+  try {
+    const transactions = await db.find({});
+    let list = [];
+    const current = new Date(Date.now());
+    transactions.forEach((data) => {
+      if(current.getDate() === data.transactionDate.getDate()){
+        list.push(current);
+      }
+    })
+
+    res.status(200).json({
+      message: 'Successfully retrieved all transactions',
+      data: list,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function getTransactionsMonthly(req, res, next) {
+  try {
+    const transactions = await db.find();
+
+    res.status(200).json({
+      message: 'Successfully retrieved all transactions',
+      data: transactions,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = (app) => {
   route.post('/', addTransactions);
   route.get('/', getTransactions);
-  //route.get('/today', getTransactionsToday);
-  //route.get('/monthly', getTransactionsMonthly);
+  route.get('/today', getTransactionsToday);
+  route.get('/monthly', getTransactionsMonthly);
   app.use('/transaction', route);
 };
