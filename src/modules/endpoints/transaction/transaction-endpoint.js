@@ -262,5 +262,5 @@ module.exports = (app) => {
   route.get('/', getTransactions);
   route.get('/today', getTransactionsToday);
   route.get('/monthly', getTransactionsMonthly);
-  app.use('/transaction', route);
+  app.use('/transactions', route);
 };
