@@ -12,6 +12,7 @@ const list = [
 const { handleAuth } = require('../middleware/middleware')
 
 async function init(){
+    console.log("Loading endpoint...");
     app.use(express.json());
     app.use(handleAuth);
     app.use('/api', route);
@@ -19,6 +20,8 @@ async function init(){
     for(const endpoint of list){
         require(endpoint)(route)
     }
+    
+    console.log("Endpoints has been loaded");
 
     app.listen(5000, (err) => {
         if(err){

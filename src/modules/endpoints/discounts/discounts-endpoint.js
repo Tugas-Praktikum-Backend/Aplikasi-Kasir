@@ -23,9 +23,14 @@ async function getDiscounts(req, res, next) {
     
     let finalResults = [];
     for(const data of result){
-      let d = [];
-      data.forEach((e, k) => d[k] = e)
-      finalResults.push(d)
+      let d = {
+        _id: data._id,
+        products: data.products,
+        discountAmount: data.discountAmount,
+        discountStart: new Date(data.discountStart * 1000).toLocaleDateString('id-ID'),
+        discountDuration: data.discountDuration + " seconds",
+      };
+      finalResults.push(d);
     }
     return res.status(201).json({ discounts: finalResults });
   } catch (err) {
@@ -86,7 +91,18 @@ async function getDiscountById(req, res, next) {
     if (!result || result.length <= 0) {
       throw Error('Invalid discount ID');
     }
-    res.status(201).json({ discounts: result });
+    let finalResults = [];
+    for(const data of result){
+      let d = {
+        _id: data._id,
+        products: data.products,
+        discountAmount: data.discountAmount,
+        discountStart: new Date(data.discountStart * 1000).toLocaleDateString('id-ID'),
+        discountDuration: data.discountDuration + " seconds",
+      };
+      finalResults.push(d);
+    }
+    res.status(201).json({ discounts: finalResults });
   } catch (err) {
     next(err);
   }

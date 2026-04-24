@@ -1,6 +1,6 @@
 const route = require('express').Router();
 const db = require('../../database/database-manager').getDatabase('Customers');
-const transactionDb = require('../../database/database-manager').getDatabase('Transactions');
+const transactionDb = require('../../database/database-manager').getDatabase('Transaction');
 
 // Controller
 async function addCustomer(req, res, next) {
