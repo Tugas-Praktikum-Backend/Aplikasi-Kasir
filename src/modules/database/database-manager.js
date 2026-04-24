@@ -11,7 +11,7 @@ const loaded = {};
 let isLoaded = false;
 
 function init() {
-  mongoose.connect(process.env.MONGO_URI).then((r) => {
+  mongoose.connect(process.env.MONGO_URI+'/kasir').then((r) => {
     for (const schemaPath of list) {
       const result = require(schemaPath)(mongoose);
       loaded[result.id] = result.model;
