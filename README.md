@@ -896,4 +896,78 @@ curl -X POST http://localhost:5000/api/transactions \
 curl -X GET http://localhost:5000/api/transactions
 ```
 
+##### 6.3. Get Transactions Today
+**Endpoint:** `GET /api/transactions/today`
+
+**Response:**
+```json
+{
+  "message": "Successfully retrieved all transactions",
+  "data": [
+    {
+      "_id": "507f1f77bcf86cd799439016",
+      "employeeId": "emp001",
+      "customerId": "cust001",
+      "itemList": [
+        {
+          "productId": "PROD001",
+          "productName": "Mie Goreng",
+          "product_amount": 2,
+          "price": 15000,
+          "subtotal": 30000
+        }
+      ],
+      "subtotal": 30000,
+      "discountAmount": 0,
+      "adminFees": 1500,
+      "totalAmount": 31500,
+      "paymentMethod": "OVO",
+      "transactionDate": "2026-04-24T10:30:00.000Z"
+    }
+  ]
+}
+```
+
+**cURL Example:**
+```bash
+curl -X GET http://localhost:5000/api/transactions/today
+```
+
+##### 6.4. Get Transactions Monthly
+**Endpoint:** `GET /api/transactions/monthly`
+
+**Response:**
+```json
+{
+  "message": "Successfully retrieved all transactions",
+  "data": [
+    {
+      "_id": "507f1f77bcf86cd799439016",
+      "employeeId": "emp001",
+      "customerId": "cust001",
+      "itemList": [
+        {
+          "productId": "PROD001",
+          "productName": "Mie Goreng",
+          "product_amount": 2,
+          "price": 15000,
+          "subtotal": 30000
+        }
+      ],
+      "subtotal": 30000,
+      "discountAmount": 0,
+      "adminFees": 1500,
+      "totalAmount": 31500,
+      "paymentMethod": "OVO",
+      "transactionDate": "2026-04-22T10:30:00.000Z"
+    }
+  ]
+}
+```
+
+**cURL Example:**
+```bash
+curl -X GET http://localhost:5000/api/transactions/monthly
+```
+
 ---
