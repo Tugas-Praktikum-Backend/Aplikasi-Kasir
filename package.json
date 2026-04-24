@@ -1,28 +1,34 @@
 {
-  "name": "aplikasi-kasir-reyhan",
+  "name": "aplikasi-kasir",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "nodemon ./index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Tugas-Praktikum-Backend/Aplikasi-Kasir-Reyhan.git"
+    "url": "git+https://github.com/Tugas-Praktikum-Backend/Aplikasi-Kasir.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Tugas-Praktikum-Backend/Aplikasi-Kasir-Reyhan/issues"
+    "url": "https://github.com/Tugas-Praktikum-Backend/Aplikasi-Kasir/issues"
   },
-  "homepage": "https://github.com/Tugas-Praktikum-Backend/Aplikasi-Kasir-Reyhan#readme",
+  "homepage": "https://github.com/Tugas-Praktikum-Backend/Aplikasi-Kasir#readme",
   "dependencies": {
     "bcrypt": "^6.0.0",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "http": "^0.0.1-security",
+    "jsonwebtoken": "^9.0.3",
+    "middleware": "^1.0.0",
     "mongoose": "^9.4.1",
     "nodemon": "^3.1.14"
+  },
+  "devDependencies": {
+    "prettier": "3.8.3"
   }
 }

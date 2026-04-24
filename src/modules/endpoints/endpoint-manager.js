@@ -3,15 +3,25 @@ const app = express();
 const route = express.Router();
 const list = [
     "./discounts/discounts-endpoint",
-    "./products/products-endpoint" 
+    "./product/product-endpoint",
+    "./customers/customers-endpoint",
+    "./employees/employees-endpoint",
+    "./shifts/shifts-endpoint",
+    "./transaction/transaction-endpoint",
 ]
+const { handleAuth } = require('../middleware/middleware')
+
 async function init(){
+    console.log("Loading endpoint...");
     app.use(express.json());
+    app.use(handleAuth);
     app.use('/api', route);
 
     for(const endpoint of list){
         require(endpoint)(route)
     }
+    
+    console.log("Endpoints has been loaded");
 
     app.listen(5000, (err) => {
         if(err){
