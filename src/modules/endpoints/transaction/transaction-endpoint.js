@@ -230,7 +230,34 @@ async function getTransactionsToday(req, res, next) {
     let list = [];
     const current = new Date(Date.now());
     transactions.forEach((data) => {
-      if(current.getDate() === data.transactionDate.getDate()){
+      if(
+        current.getDate() === data.transactionDate.getDate() &&
+        current.getMonth() === data.transactionDate.getMonth() &&
+        current.getFullYear() === data.transactionDate.getFullYear()
+      ){
+        list.push(data);
+      }
+    })
+
+    res.status(200).json({
+      message: 'Successfully retrieved all transactions',
+      data: list,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function getTransactionsMonthly(req, res, next) {
+  try {
+    const transactions = await db.find({});
+    let list = [];
+    const current = new Date(Date.now());
+    transactions.forEach((data) => {
+      if(
+        current.getMonth() === data.transactionDate.getMonth() &&
+        current.getFullYear() === data.transactionDate.getFullYear()
+      ){
         list.push(data);
       }
     })
@@ -262,5 +289,5 @@ module.exports = (app) => {
   route.get('/', getTransactions);
   route.get('/today', getTransactionsToday);
   route.get('/monthly', getTransactionsMonthly);
-  app.use('/transaction', route);
+  app.use('/transactions', route);
 };
