@@ -812,11 +812,11 @@ curl -X GET http://localhost:5000/api/shifts/emp001
   "purchase_list": [
     {
       "product_id": "PROD001",
-      "quantity": 2
+      "product_amount": 2
     },
     {
       "product_id": "PROD002",
-      "quantity": 1
+      "product_amount": 1
     }
   ]
 }
@@ -875,7 +875,7 @@ curl -X POST http://localhost:5000/api/transactions \
         {
           "productId": "PROD001",
           "productName": "Mie Goreng",
-          "quantity": 2,
+          "product_amount": 2,
           "price": 15000,
           "subtotal": 30000
         }
