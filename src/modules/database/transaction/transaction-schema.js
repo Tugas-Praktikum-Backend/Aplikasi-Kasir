@@ -55,10 +55,6 @@ module.exports = (db) => ({
         type: String,
         required: true,
       },
-      /*    discount: {
-        type: Number,
-        ref: 'Discounts',
-      },*/
       adminFee: {
         type: Number,
         default: 0,
